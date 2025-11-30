@@ -1,0 +1,26 @@
+pdf-viewer-app/
+├── app.py
+├── requirements.txt
+├── config.py
+├── auth.py
+├── models.py
+├── templates/
+│   ├── base.html
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   ├── upload.html
+│   └── admin.html
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   ├── js/
+│   │   └── script.js
+│   └── images/
+│       └── thumbnails/
+├── pdfs/
+│   ├── user_uploads/
+│   └── thumbnails/
+├── migrations/
+└── instance/
+    └── app.db
