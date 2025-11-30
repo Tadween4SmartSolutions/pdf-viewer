@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="share-created-container">
+    <div class="success-message">
+        <i class="fas fa-check-circle fa-3x"></i>
+        <h2>Share Link Created!</h2>
+        <p>Your PDF <strong>{{ pdf_file.original_filename }}</strong> is now shareable.</p>
+    </div>
+    
+    <div class="share-details">
+        <div class="share-url-container">
+            <label>Share URL:</label>
+            <div class="url-display">
+                <input type="text" value="{{ share_url }}" id="shareUrl" readonly>
+                <button onclick="copyShareUrl()" class="btn btn-copy">
+                    <i class="fas fa-copy"></i> Copy
+                </button>
+            </div>
+        </div>
+        
+        <div class="share-info">
+            <div class="info-item">
+                <strong>Expires:</strong>
+                {% if share.max_access_count > 0 %}
+                    After {{ share.max_access_count }} accesses
+                {% else %}
+                    {{ share.expires_at.strftime('%Y-%m-%d %H:%M') }}
+                {% endif %}
+            </div>
+            <div class="info-item">
+                <strong>Download:</strong>
+                {{ "Allowed" if share.allow_download else "Not allowed" }}
+            </div>
+            <div class="info-item">
+                <strong>Password:</strong>
+                {{ "Protected" if share.password_hash else "No password" }}
+            </div>
+            <div class="info-item">
+                <strong>Accesses:</strong>
+                {{ share.current_access_count }} / {{ share.max_access_count if share.max_access_count > 0 else 'Unlimited' }}
+            </div>
+        </div>
+    </div>
+    
+    <div class="action-buttons">
+        <a href="{{ share_url }}" target="_blank" class="btn btn-primary">
+            <i class="fas fa-external-link-alt"></i> Test Share Link
+        </a>
+        <a href="{{ url_for('manage_shares') }}" class="btn btn-secondary">
+            <i class="fas fa-cog"></i> Manage All Shares
+        </a>
+        <a href="{{ url_for('index') }}" class="btn btn-outline">
+            <i class="fas fa-home"></i> Back to Home
+        </a>
+    </div>
+</div>
+
+<script>
+function copyShareUrl() {
+    const urlInput = document.getElementById('shareUrl');
+    urlInput.select();
+    urlInput.setSelectionRange(0, 99999);
+    document.execCommand('copy');
+    
+    const btn = event.target.closest('button');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    btn.classList.add('btn-success');
+    
+    setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.classList.remove('btn-success');
+    }, 2000);
+}
+</script>
+{% endblock %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="share-container">
+    <div class="share-header">
+        <h2>Share PDF</h2>
+        <p>Create a shareable link for: <strong>{{ pdf_file.original_filename }}</strong></p>
+    </div>
+    
+    <form method="POST" class="share-form">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-section">
+            <h3>Expiration Settings</h3>
+            
+            <div class="form-group">
+                {{ form.expiration_type.label }}
+                {{ form.expiration_type(class="form-control", onchange="toggleExpirationFields()") }}
+            </div>
+            
+            <div id="date-field" class="form-group expiration-field">
+                {{ form.expires_at.label }}
+                {{ form.expires_at(class="form-control") }}
+            </div>
+            
+            <div id="days-field" class="form-group expiration-field">
+                {{ form.days_valid.label }}
+                {{ form.days_valid(class="form-control") }}
+            </div>
+            
+            <div id="downloads-field" class="form-group expiration-field">
+                {{ form.max_access_count.label }}
+                {{ form.max_access_count(class="form-control") }}
+                <small class="form-text">Link will expire after this many accesses</small>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Access Settings</h3>
+            
+            <div class="form-group">
+                {{ form.allow_download() }}
+                {{ form.allow_download.label }}
+            </div>
+            
+            <div class="form-group">
+                {{ form.password.label }}
+                {{ form.password(class="form-control", placeholder="Optional - leave blank for no password") }}
+                <small class="form-text">Add a password to protect the shared link</small>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h3>Share Information</h3>
+            
+            <div class="form-group">
+                {{ form.description.label }}
+                {{ form.description(class="form-control", rows="3", placeholder="Optional description for this share") }}
+            </div>
+        </div>
+        
+        <div class="form-actions">
+            {{ form.submit(class="btn btn-primary btn-lg") }}
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+
+<script>
+function toggleExpirationFields() {
+    const type = document.getElementById('expiration_type').value;
+    document.querySelectorAll('.expiration-field').forEach(field => {
+        field.style.display = 'none';
+    });
+    
+    if (type === 'date') {
+        document.getElementById('date-field').style.display = 'block';
+    } else if (type === 'days') {
+        document.getElementById('days-field').style.display = 'block';
+    } else if (type === 'downloads') {
+        document.getElementById('downloads-field').style.display = 'block';
+    }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    toggleExpirationFields();
+});
+</script>
+{% endblock %}

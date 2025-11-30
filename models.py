@@ -1,7 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
+import secrets
 
 db = SQLAlchemy()
 
@@ -15,6 +16,7 @@ class User(UserMixin, db.Model):
     
     # Relationship with PDF files
     pdf_files = db.relationship('PDFFile', backref='owner', lazy=True)
+    shares = db.relationship('Share', backref='owner', lazy=True)
 
 class PDFFile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -40,6 +42,9 @@ class PDFFile(db.Model):
     # Privacy settings
     is_public = db.Column(db.Boolean, default=True)
     
+    # Relationships
+    shares = db.relationship('Share', backref='pdf_file', lazy=True, cascade='all, delete-orphan')
+    
     def get_thumbnail_url(self):
         if self.thumbnail_path and os.path.exists(self.thumbnail_path):
             return f'/thumbnails/{os.path.basename(self.thumbnail_path)}'
@@ -57,5 +62,61 @@ class PDFFile(db.Model):
             'title': self.title,
             'author': self.author,
             'thumbnail_url': self.get_thumbnail_url(),
-            'is_public': self.is_public
+            'is_public': self.is_public,
+            'share_count': len(self.shares)
+        }
+
+class Share(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    share_token = db.Column(db.String(32), unique=True, nullable=False, index=True)
+    pdf_file_id = db.Column(db.Integer, db.ForeignKey('pdf_file.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    # Share settings
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    max_access_count = db.Column(db.Integer, default=0)  # 0 = unlimited
+    current_access_count = db.Column(db.Integer, default=0)
+    
+    # Access tracking
+    last_accessed = db.Column(db.DateTime)
+    
+    # Share options
+    allow_download = db.Column(db.Boolean, default=True)
+    password_hash = db.Column(db.String(255))  # Optional password protection
+    
+    # Share metadata
+    description = db.Column(db.String(500))
+    
+    def is_expired(self):
+        return datetime.utcnow() > self.expires_at
+    
+    def is_access_limit_reached(self):
+        return self.max_access_count > 0 and self.current_access_count >= self.max_access_count
+    
+    def is_active(self):
+        return not self.is_expired() and not self.is_access_limit_reached()
+    
+    def record_access(self):
+        self.current_access_count += 1
+        self.last_accessed = datetime.utcnow()
+        db.session.commit()
+    
+    def get_share_url(self, base_url):
+        return f"{base_url}/shared/{self.share_token}"
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'share_token': self.share_token,
+            'pdf_file': self.pdf_file.to_dict(),
+            'created_at': self.created_at.isoformat(),
+            'expires_at': self.expires_at.isoformat(),
+            'max_access_count': self.max_access_count,
+            'current_access_count': self.current_access_count,
+            'last_accessed': self.last_accessed.isoformat() if self.last_accessed else None,
+            'allow_download': self.allow_download,
+            'is_active': self.is_active(),
+            'description': self.description,
+            'share_url': self.get_share_url(request.host_url if 'request' in globals() else '')
         }

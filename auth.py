@@ -9,7 +9,7 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for('index'))
     
     form = LoginForm()
     if form.validate_on_submit():
@@ -18,7 +18,7 @@ def login():
         if user and check_password_hash(user.password_hash, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
-            return redirect(next_page or url_for('main.index'))
+            return redirect(next_page or url_for('index'))
         else:
             flash('Invalid username or password', 'error')
     
@@ -27,7 +27,7 @@ def login():
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for('index'))
     
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -60,4 +60,4 @@ def register():
 def logout():
     logout_user()
     flash('You have been logged out.', 'success')
-    return redirect(url_for('main.index'))
+    return redirect(url_for('index'))

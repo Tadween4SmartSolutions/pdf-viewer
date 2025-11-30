@@ -1,7 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, FileField, TextAreaField, SelectField
-from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, FileField, TextAreaField, SelectField, IntegerField, DateTimeField
+from wtforms.validators import DataRequired, Email, Length, EqualTo, ValidationError, NumberRange, Optional
+from wtforms.fields import DateField, TimeField
 import re
+from datetime import datetime, timedelta
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -48,3 +50,54 @@ class SearchForm(FlaskForm):
         ('all', 'All')
     ], default='all')
     submit = SubmitField('Search')
+
+class ShareForm(FlaskForm):
+    # Expiration settings
+    expiration_type = SelectField('Expiration', choices=[
+        ('never', 'Never Expire'),
+        ('date', 'Expire on Date'),
+        ('days', 'Expire after Days'),
+        ('downloads', 'Expire after Downloads')
+    ], default='days')
+    
+    expires_at = DateTimeField('Expiration Date', format='%Y-%m-%d %H:%M', 
+                              validators=[Optional()],
+                              default=datetime.utcnow() + timedelta(days=7))
+    
+    days_valid = IntegerField('Days Valid', 
+                             validators=[Optional(), NumberRange(min=1)],
+                             default=7)
+    
+    max_access_count = IntegerField('Max Number of Accesses', 
+                                   validators=[Optional(), NumberRange(min=1)],
+                                   default=10)
+    
+    # Access settings
+    allow_download = BooleanField('Allow Download', default=True)
+    password = PasswordField('Password (Optional)', 
+                            validators=[Optional(), Length(min=4)])
+    
+    # Share information
+    description = TextAreaField('Description (Optional)',
+                               validators=[Optional(), Length(max=500)])
+    
+    submit = SubmitField('Create Share Link')
+    
+    def validate(self, **kwargs):
+        initial_validation = super(ShareForm, self).validate()
+        if not initial_validation:
+            return False
+        
+        if self.expiration_type.data == 'date' and not self.expires_at.data:
+            self.expires_at.errors.append('Please select an expiration date')
+            return False
+        
+        if self.expiration_type.data == 'days' and not self.days_valid.data:
+            self.days_valid.errors.append('Please enter number of days')
+            return False
+        
+        if self.expiration_type.data == 'downloads' and not self.max_access_count.data:
+            self.max_access_count.errors.append('Please enter maximum number of accesses')
+            return False
+        
+        return True
