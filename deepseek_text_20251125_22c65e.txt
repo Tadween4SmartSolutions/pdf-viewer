@@ -1,0 +1,14 @@
+pdf-viewer-app/
+├── app.py
+├── templates/
+│   ├── index.html
+│   └── base.html
+├── static/
+│   ├── css/
+│   │   └── style.css
+│   └── js/
+│       └── script.js
+└── pdfs/
+    ├── sample1.pdf
+    ├── sample2.pdf
+    └── ...
