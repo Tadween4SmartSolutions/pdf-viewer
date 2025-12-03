@@ -127,6 +127,17 @@ def create_app(config_name='default'):
         if not os.path.exists(pdf.file_path):
             abort(404)
         return send_file(pdf.file_path, as_attachment=False)
+
+    @app.route('/thumbnails/<path:filename>')
+    def serve_thumbnail(filename):
+        """Serve a thumbnail image from the thumbnails folder."""
+        thumb_folder = app.config.get('THUMBNAIL_FOLDER')
+        if not thumb_folder:
+            abort(404)
+        path = os.path.join(thumb_folder, filename)
+        if not os.path.exists(path):
+            abort(404)
+        return send_file(path, mimetype='image/png', as_attachment=False)
     
     # ... existing routes (search, upload, serve_pdf, serve_thumbnail, pdf_preview, api/pdfs, admin) ...
     

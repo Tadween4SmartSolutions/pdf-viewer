@@ -12,7 +12,11 @@
     {% for pdf in pdfs.items %}
     <div class="pdf-card" data-filename="{{ pdf.filename }}">
         <div class="pdf-icon">
-            <i class="fas fa-file-pdf"></i>
+            {% if pdf.get_thumbnail_url() %}
+                <img class="pdf-thumb" src="{{ pdf.get_thumbnail_url() }}" alt="{{ pdf.original_filename }} thumbnail">
+            {% else %}
+                <i class="fas fa-file-pdf"></i>
+            {% endif %}
         </div>
         <div class="pdf-info">
             <h3 class="pdf-title">{{ pdf.original_filename }}</h3>
