@@ -29,10 +29,13 @@ def ensure_admin():
 
 with app.app_context():
     upload_folder = app.config.get('UPLOAD_FOLDER')
-    # allow optional override: `tools/import_pdfs.py <path-to-folder>`
+    # allow optional override: `tools/import_pdfs.py <path-to-folder> [--force]`
     import sys as _sys
-    if len(_sys.argv) > 1 and _sys.argv[1]:
-        upload_folder = _sys.argv[1]
+    force = ('--force' in _sys.argv) or ('-f' in _sys.argv)
+    # first non-flag arg can be the folder
+    args = [a for a in _sys.argv[1:] if not a.startswith('-')]
+    if len(args) > 0 and args[0]:
+        upload_folder = args[0]
     thumb_folder = app.config.get('THUMBNAIL_FOLDER')
     if not upload_folder:
         print('No UPLOAD_FOLDER configured in app. Aborting.')
@@ -46,14 +49,15 @@ with app.app_context():
     user = User.query.first() or ensure_admin()
 
     added = 0
+    updated = 0
     for fname in os.listdir(upload_folder):
         if not fname.lower().endswith('.pdf'):
             continue
         file_path = os.path.join(upload_folder, fname)
         # check DB by filename
         existing = PDFFile.query.filter_by(filename=fname).first()
-        if existing:
-            print(f'Skipping existing DB entry for {fname}')
+        if existing and not force:
+            print(f'Skipping existing DB entry for {fname} (use --force to update)')
             continue
 
         # Generate thumbnail
@@ -69,25 +73,40 @@ with app.app_context():
 
         file_size = os.path.getsize(file_path)
 
-        pdf = PDFFile(
-            filename=fname,
-            original_filename=fname,
-            file_path=os.path.abspath(file_path),
-            thumbnail_path=os.path.abspath(thumb_path) if ok else None,
-            file_size=file_size,
-            page_count=metadata.get('page_count', None),
-            extracted_text=pdf_processor.extract_text(file_path),
-            title=metadata.get('title') or '',
-            author=metadata.get('author') or '',
-            subject=metadata.get('subject') or '',
-            user_id=user.id,
-            is_public=True,
-            upload_date=datetime.utcnow()
-        )
-        db.session.add(pdf)
-        added += 1
-        print(f'Added DB entry for {fname}')
+        if existing:
+            # update existing record
+            existing.original_filename = fname
+            existing.file_path = os.path.abspath(file_path)
+            existing.thumbnail_path = os.path.abspath(thumb_path) if ok else existing.thumbnail_path
+            existing.file_size = file_size
+            existing.page_count = metadata.get('page_count', existing.page_count)
+            existing.extracted_text = pdf_processor.extract_text(file_path)
+            existing.title = metadata.get('title') or existing.title
+            existing.author = metadata.get('author') or existing.author
+            existing.subject = metadata.get('subject') or existing.subject
+            db.session.add(existing)
+            updated += 1
+            print(f'Updated DB entry for {fname}')
+        else:
+            pdf = PDFFile(
+                filename=fname,
+                original_filename=fname,
+                file_path=os.path.abspath(file_path),
+                thumbnail_path=os.path.abspath(thumb_path) if ok else None,
+                file_size=file_size,
+                page_count=metadata.get('page_count', None),
+                extracted_text=pdf_processor.extract_text(file_path),
+                title=metadata.get('title') or '',
+                author=metadata.get('author') or '',
+                subject=metadata.get('subject') or '',
+                user_id=user.id,
+                is_public=True,
+                upload_date=datetime.utcnow()
+            )
+            db.session.add(pdf)
+            added += 1
+            print(f'Added DB entry for {fname}')
 
-    if added:
+    if added or updated:
         db.session.commit()
-    print(f'Done. Added {added} files.')
+    print(f'Done. Added {added} files, updated {updated} files.')

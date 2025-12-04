@@ -17,7 +17,8 @@ function searchPDFs() {
 // Modal functionality
 const modal = document.getElementById('previewModal');
 const closeBtn = document.querySelector('.close');
-const pdfPreview = document.getElementById('pdfPreview');
+// PDF.js viewer will render into #pdfCanvas
+// const pdfPreview removed (we use pdfjsViewer)
 const openPdfLink = document.getElementById('openPdfLink');
 const previewTitle = document.getElementById('previewTitle');
 
@@ -29,22 +30,46 @@ document.addEventListener('click', function(e) {
         const btn = e.target.classList.contains('preview-btn') ? 
                    e.target : e.target.parentElement;
         const filename = btn.getAttribute('data-filename');
-        
-        openPreview(filename);
+        const pdfId = btn.getAttribute('data-pdf-id');
+
+        // Prefer advanced preview when pdf id is available
+        if (pdfId) {
+            openAdvancedPreview(pdfId);
+        } else {
+            openPreview(filename);
+        }
     }
 });
 
 function openPreview(filename) {
-    const pdfUrl = `/pdf/${filename}`;
-    pdfPreview.src = pdfUrl;
-    openPdfLink.href = pdfUrl;
+    const pdfUrl = `/pdf/${encodeURIComponent(filename)}`;
     previewTitle.textContent = `Preview: ${filename}`;
+    openPdfLink.href = pdfUrl;
     modal.style.display = 'block';
+    showSpinner();
+
+    // Use pdfjsViewer to load and render PDF into canvas
+    if (window.pdfjsViewer && typeof window.pdfjsViewer.load === 'function') {
+        window.pdfjsViewer.load(pdfUrl)
+            .then(info => {
+                hideSpinner();
+                // reset zoom
+                if (window.pdfjsViewer && window.pdfjsViewer.resetZoom) window.pdfjsViewer.resetZoom();
+                updatePageNavigation(info.page_count);
+            })
+            .catch(err => {
+                hideSpinner();
+                console.error('PDF.js load error', err);
+                alert('Failed to load PDF preview. Open full PDF instead.');
+            });
+    } else {
+        hideSpinner();
+        alert('PDF viewer not available');
+    }
 }
 
 function closePreview() {
     modal.style.display = 'none';
-    pdfPreview.src = '';
 }
 
 closeBtn.addEventListener('click', closePreview);
@@ -174,52 +199,129 @@ let currentPage = 1;
 function openAdvancedPreview(pdfId) {
     currentPdfId = pdfId;
     currentPage = 1;
-    
+    showSpinner();
     fetch(`/preview/${pdfId}`)
         .then(response => response.json())
         .then(data => {
             if (data.error) {
+                hideSpinner();
                 alert(data.error);
                 return;
             }
-            
+
             document.getElementById('previewTitle').textContent = data.original_filename;
-            document.getElementById('pdfPreview').src = `/pdf/${pdfId}#page=1`;
             document.getElementById('openPdfLink').href = `/pdf/${pdfId}`;
-            
-            // Update page navigation
-            updatePageNavigation(data.page_count);
-            
+            // request PDF via PDF.js viewer
             modal.style.display = 'block';
+            if (window.pdfjsViewer && typeof window.pdfjsViewer.load === 'function') {
+                window.pdfjsViewer.load(`/pdf/${pdfId}`)
+                    .then(info => {
+                        hideSpinner();
+                        if (window.pdfjsViewer && window.pdfjsViewer.resetZoom) window.pdfjsViewer.resetZoom();
+                        updatePageNavigation(info.page_count);
+                    })
+                    .catch(err => {
+                        hideSpinner();
+                        console.error('PDF.js load error', err);
+                        alert('Failed to load PDF preview.');
+                    });
+            } else {
+                hideSpinner();
+                alert('PDF viewer not available');
+            }
         })
         .catch(error => {
+            hideSpinner();
             console.error('Error loading preview:', error);
         });
 }
 
 function updatePageNavigation(totalPages) {
-    const navHtml = `
-        <div class="page-navigation">
-            <button onclick="changePage(-1)" ${currentPage <= 1 ? 'disabled' : ''}>
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <span>Page ${currentPage} of ${totalPages}</span>
-            <button onclick="changePage(1)" ${currentPage >= totalPages ? 'disabled' : ''}>
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    `;
-    
-    const existingNav = document.querySelector('.page-navigation');
-    if (existingNav) {
-        existingNav.remove();
+    // update page info and navigation buttons
+    const pageInfo = document.getElementById('pageInfo');
+    if (!pageInfo) return;
+    // ask pdfjsViewer for current page if available
+    let cur = currentPage;
+    if (window.pdfjsViewer && window.pdfjsViewer.getState) {
+        try { cur = window.pdfjsViewer.getState().currentPage || currentPage; } catch(e){}
     }
-    
-    document.querySelector('.preview-container').insertAdjacentHTML('beforebegin', navHtml);
+    pageInfo.textContent = `Page ${cur} of ${totalPages}`;
+    // manage previous/next state via enabling/disabling toolbar buttons
 }
 
 function changePage(delta) {
-    currentPage += delta;
-    document.getElementById('pdfPreview').src = `/pdf/${currentPdfId}#page=${currentPage}`;
-    updatePageNavigation(document.querySelector('.page-navigation span').textContent.split(' of ')[1]);
+    showSpinner();
+    if (!window.pdfjsViewer) {
+        hideSpinner();
+        return;
+    }
+    const fn = delta > 0 ? window.pdfjsViewer.nextPage : window.pdfjsViewer.prevPage;
+    if (typeof fn === 'function') {
+        fn().then(() => {
+            // update local tracker
+            if (window.pdfjsViewer && window.pdfjsViewer.getState) {
+                const s = window.pdfjsViewer.getState();
+                currentPage = s.currentPage;
+                updatePageNavigation(s.pdf ? s.pdf.numPages : null);
+            }
+            hideSpinner();
+        }).catch(err => { hideSpinner(); console.error(err); });
+    } else {
+        hideSpinner();
+    }
+}
+
+// Spinner helpers
+function showSpinner() {
+    const s = document.getElementById('previewSpinner');
+    if (s) s.style.display = 'block';
+}
+
+function hideSpinner() {
+    const s = document.getElementById('previewSpinner');
+    if (s) s.style.display = 'none';
+}
+
+// Zoom handling (scale the iframe)
+let currentZoom = 1;
+function zoomIn() {
+    if (window.pdfjsViewer && window.pdfjsViewer.zoomIn) {
+        showSpinner();
+        window.pdfjsViewer.zoomIn().then(() => hideSpinner()).catch(err => { hideSpinner(); console.error(err); });
+    } else {
+        currentZoom = +(currentZoom + 0.1).toFixed(2);
+        applyZoom();
+    }
+}
+
+function zoomOut() {
+    if (window.pdfjsViewer && window.pdfjsViewer.zoomOut) {
+        showSpinner();
+        window.pdfjsViewer.zoomOut().then(() => hideSpinner()).catch(err => { hideSpinner(); console.error(err); });
+    } else {
+        currentZoom = Math.max(0.2, +(currentZoom - 0.1).toFixed(2));
+        applyZoom();
+    }
+}
+
+function resetZoom() {
+    if (window.pdfjsViewer && window.pdfjsViewer.resetZoom) {
+        showSpinner();
+        window.pdfjsViewer.resetZoom().then(() => hideSpinner()).catch(err => { hideSpinner(); console.error(err); });
+    } else {
+        currentZoom = 1;
+        applyZoom();
+    }
+}
+
+function applyZoom() {
+    const wrapper = document.querySelector('.preview-container-wrapper');
+    const canvas = document.getElementById('pdfCanvas');
+    if (canvas && wrapper) {
+        canvas.style.transform = `scale(${currentZoom})`;
+        canvas.style.transformOrigin = 'top left';
+        // adjust wrapper scroll area if needed
+        canvas.style.width = `${100 / currentZoom}%`;
+        // height will be automatic based on canvas render
+    }
 }

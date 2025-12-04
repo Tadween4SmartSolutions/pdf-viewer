@@ -2,6 +2,19 @@
 
 {% block title %}Home - PDF Viewer{% endblock %}
 
+{% block head %}
+<style>
+/* Preview modal toolbar and spinner */
+.preview-toolbar { display:flex; gap:8px; align-items:center; margin-bottom:8px; }
+.preview-toolbar button { padding:6px 10px; }
+.preview-container-wrapper { overflow:auto; width:100%; height:600px; }
+.preview-container-wrapper iframe { width:100%; height:100%; transform-origin: top left; }
+.preview-container-wrapper canvas { width:100%; height:auto; display:block; }
+.spinner { display:none; width:48px; height:48px; border:6px solid #f3f3f3; border-top:6px solid #3498db; border-radius:50%; animation:spin 1s linear infinite; margin:10px auto; }
+@keyframes spin { from { transform:rotate(0deg);} to { transform:rotate(360deg);} }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="search-bar">
     <input type="text" id="searchInput" placeholder="Search PDF files..." onkeyup="searchPDFs()">
@@ -29,8 +42,9 @@
                title="Open PDF">
                 <i class="fas fa-external-link-alt"></i>
             </a>
-            <button class="btn btn-secondary preview-btn" 
+                <button class="btn btn-secondary preview-btn" 
                     data-filename="{{ pdf.filename }}"
+                    data-pdf-id="{{ pdf.id }}"
                     title="Preview PDF">
                 <i class="fas fa-eye"></i>
             </button>
@@ -57,8 +71,19 @@
     <div class="modal-content">
         <span class="close">&times;</span>
         <h2 id="previewTitle">PDF Preview</h2>
-        <div class="preview-container">
-            <iframe id="pdfPreview" width="100%" height="600px" frameborder="0"></iframe>
+        <div class="preview-toolbar">
+            <button class="btn" onclick="changePage(-1)" title="Previous page">&#8592;</button>
+            <button class="btn" onclick="changePage(1)" title="Next page">&#8594;</button>
+            <button class="btn" onclick="zoomOut()" title="Zoom out">-</button>
+            <button class="btn" onclick="zoomIn()" title="Zoom in">+</button>
+            <button class="btn" onclick="resetZoom()" title="Reset zoom">Reset</button>
+            <span id="pageInfo" style="margin-left:auto"></span>
+        </div>
+        <div id="previewSpinner" class="spinner"></div>
+        <div class="preview-container-wrapper">
+            <div id="pdfjsViewer" style="width:100%; height:600px;">
+                <canvas id="pdfCanvas" style="width:100%; height:auto; display:block;"></canvas>
+            </div>
         </div>
         <div class="modal-actions">
             <a id="openPdfLink" href="#" target="_blank" class="btn btn-primary">
