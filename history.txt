@@ -1,0 +1,318 @@
+    1  cd /Users/ahmedalawlaqi/Desktop/xCODE/myWhats/
+    2  pod init
+    3  pod init
+    4  sudo gem install cocopods
+    5  sudo gem install cocoapods
+    6  cd /Users/ahmedalawlaqi/Desktop/xCODE/myWhats/
+    7  pod init
+    8  ls
+    9  vi Podfile
+   10  open ./
+   11  pod
+   12  pod install
+   13  /file ; exit;
+   14  ls
+   15  cd Pictures
+   16  ls
+   17  quit
+   18  exit
+   19  ls
+   20  /Users/ahmedalawlaqi/bin/helper_update ; exit;
+   21  /Users/ahmedalawlaqi/bin/helper_update ; exit;
+   22  /Users/ahmedalawlaqi/bin/helper_update ; exit;
+   23  ps
+   24  vm_stat
+   25  purge
+   26  top
+   27  purge
+   28  /Users/ahmedalawlaqi/bin/helper_update ; exit;
+   29  touch macAir.md
+   30  pwd
+   31  open .
+   32  /Users/ahmedalawlaqi/bin/helper_update ; exit;
+   33  /Library/swore/pYPbevnn/LFAHzgey/GPZxwirI/HbWxzFeR/willfully_ungruesome ; exit;
+   34  find andour
+   35  find syncservice
+   36  find ~ -name syncservice
+   37  cd library
+   38  open .
+   39  find ~ -name fmopogpohg
+   40  git config --list
+   41  git config --local --list
+   42  ps
+   43  cd
+   44  pwd
+   45  du -sh
+   46  du -sm
+   47  du -h --max-depth=1 | sort -hr
+   48  du -sch *.pdf | tail -n 1
+   49  cd ..
+   50  du -sch *.pdf | tail -n 1
+   51  find . -type f -name '*.pdf' -exec du -ch {} + | tail -n 1
+   52  find . -type f -name '*.pdf' -exec du -ch {} + | grep total
+   53  find . -type f -name '*.pdf' -printf "%h|%s\n" | awk -F'|' '{sum[$1]+=$2} END {for (dir in sum) print sum[dir], dir}' | numfmt --to=iec --suffix=B
+   54  du -sh --max-depth=1 ./*
+   55  du -sh -d 1
+   56  find . -type f -name '*.pdf' -print0 | xargs -0 du -ch
+   57  find . -type f -name '*.pdf' -printf "%h|%s\n" | awk -F'|' '{sum[$1]+=$2} END {for (dir in sum) print sum[dir], dir}'
+   58  find . -type f -name '*.pdf' -printf "%h|%s\n" | awk -F'|' '{sum[$1]+=$2} END {for (dir in sum) print sum[dir], dir}' | numfmt --to=iec --suffix=B
+   59  find . -type f -name '*.pdf' -exec stat -f "%Sb|%N" {} \; | awk -F'|' '{sum[$2]+=$1} END {for (dir in sum) print sum[dir], dir}'
+   60  find . -type f -name '*.pdf' -exec du -sk {} \; | awk '{ sum[$2] += $1 } END { for (dir in sum) print sum[dir] " KB\t" dir }'
+   61  touch file_summary.py
+   62  python file_summary.py 
+   63  python3 file_summary.py 
+   64  cd ../Meric/
+   65  python3 ../Codes/file_summary.py 
+   66  cd ../Books/
+   67  python3 ../Codes/file_summary.py 
+   68  cd ..
+   69  cd code
+   70  cd Codes/
+   71  touch folder_summary.py
+   72  python3 folder_summary.py 
+   73  python3 folder_summary.py 
+   74  python3 folder_summary.py 
+   75  mv ../../Documents/write\ python\ script\ to\ summarize\ files\ types\ and\ its\ sizes\ on\ current\ folder\ -\ Google\ Search.pdf .
+   76  xcode-select --install
+   77  ./.venv/bin/python tools/check_endpoints.py
+   78  ./.venv/bin/python tools/import_pdfs.py
+   79  ./.venv/bin/python tools/import_pdfs.py
+   80  ls -la pdfs && echo '--- user_uploads ---' && ls -la pdfs/user_uploads || true
+   81  ./.venv/bin/python tools/import_pdfs.py pdfs
+   82  ./.venv/bin/python -m pip uninstall -y fitz
+   83  ./.venv/bin/python -m pip install --upgrade PyMuPDF
+   84  ./.venv/bin/python tools/import_pdfs.py pdfs --force
+   85  ls -la pdfs/thumbnails || true
+   86  cd Downloads/
+   87  touch Dockerfile
+   88  mv Dockerfile files
+   89  cd files
+   90  cd files
+   91  ls
+   92  python3 app.py 
+   93  python -m venv venv
+   94  pip venv
+   95  pip3 install venv
+   96  python3 -m venv .venv
+   97  source .venv/bin/activate
+   98  python3 app.py 
+   99  pip3 install -r requirements.txt 
+  100  python3 app.py 
+  101  cd ..
+  102  cd bookmark
+  103  python3 app.py 
+  104  python3 app.py 
+  105  ls
+  106  deactive
+  107  deactivate
+  108  python3 -m venv .venv
+  109  source .venv/bin/activate
+  110  python3 app.py 
+  111  python --version
+  112  python3 app.py 
+  113  python3 app.py 
+  114  python3 app.py 
+  115  deactivate
+  116  cd ..
+  117  cd ../Documents/
+  118  git clone https://github.com/tadween4smart-creator/Bookmark-custody.git
+  119  cd Bookmark-custody/
+  120  ls
+  121  git status
+  122  git branch
+  123  open .gitignore 
+  124  git status
+  125  cd ..
+  126  git clone https://github.com/llimllib/yt-transcribe.git
+  127  mkdir ../Downloads/pdf-viewer
+  128  mv ../Downloads/pdf-viewer/ .
+  129  cd pdf-viewer/
+  130  mv templates/deepseek_text_20251125_22c65e.txt .
+  131  python3 app.py 
+  132  pip install flask
+  133  pip3 install flask
+  134  python3 app.py 
+  135  python3 app.py 
+  136  pwd
+  137  git status
+  138  ls
+  139  python3 app.py 
+  140  git status
+  141  git init
+  142  git status
+  143  rm .DS_Store
+  144  git status
+  145  git add .
+  146  git commit -m "initial commet"
+  147  git status
+  148  git status
+  149  cat .gitignore
+  150  cat > .gitignore
+  151  git status
+  152  open .gitignore 
+  153  git status
+  154  open .gitignore 
+  155  git status
+  156  open .gitignore 
+  157  python3 app.py 
+  158  history 
+  159  python3 -m venv .venv
+  160  source .venv/bin/activate
+  161  pip install -r requirements.txt
+  162  pip3 install -r requirements.txt
+  163  pip3 install -r requirements.txt
+  164  python3 app.py 
+  165  pip3 install fitz
+  166  ls -l initialize-db.sh 
+  167  ls
+  168  flask db init
+  169  pip3 install fitz
+  170  flask db init
+  171  pip show flask
+  172  pip3 install flask
+  173  flask db init
+  174  pip3 install -r requirements.txt
+  175  pip3 install PyMuPDF
+  176  python3 -m pip install --upgrade pip
+  177  pip3 install -r requirements.txt
+  178  flask db init
+  179  pip3 install frontend
+  180  flask db init
+  181  pip3 install tools
+  182  flask db init
+  183  python3 app.py
+  184  pip3 install email_validator
+  185  flask db init
+  186  flask db migrate -m "Initial migration"
+  187  flask db upgrade
+  188  python3 create-admin.py 
+  189  sqlite3 instance/app.db .table
+  190  sqlite3 instance/app.db "select * from user;"
+  191  git status
+  192  open .gitignore 
+  193  git status
+  194  python3 app.py
+  195  git status
+  196  git add .
+  197  git status
+  198  git commit -m "add enhanced features"
+  199  git status
+  200  git status
+  201  git status
+  202  git status
+  203  python3 app.py
+  204  git status
+  205  python3 app.py
+  206  python3 app.py
+  207  python3 app.py
+  208  python3 app.py
+  209  git status
+  210  python3 app.py
+  211  git status
+  212  git add .
+  213  git status
+  214  git commit -m "fix some issues"
+  215  git status
+  216  python3 app.py
+  217  touch fix.md
+  218  python3 app.py
+  219  git status
+  220  git log
+  221  git add.
+  222  git add 
+  223  git add .
+  224  git commit -m "fix showing list of files"
+  225  git status
+  226  git status
+  227  python3 app.py
+  228  ls
+  229  ls instance/
+  230  sqlite3 instance/app.db .table
+  231  sqlite3 instance/app.db "select * from user;"
+  232  sqlite3 instance/app.db "select * from pdf_file;"
+  233  sqlite3 instance/app.db "select * from alembic_version;"
+  234  sqlite3 instance/app.db .taschema
+  235  sqlite3 instance/app.db .schema
+  236  git status
+  237  git status
+  238  git status
+  239  python3 app.py
+  240  git status
+  241  git add.
+  242  git add .
+  243  git commit -m "fix pdf preview"
+  244  git status
+  245  git status
+  246  python3 app.py
+  247  git status
+  248  python3 app.py
+  249  git config
+  250  git config --global
+  251  git config --get
+  252  git config --get-all
+  253  git status
+  254  python3 app.py
+  255  git status
+  256  git add .
+  257  git commit -m "enhance pdf viewer"
+  258  git status
+  259  git status
+  260  git add .
+  261  git status
+  262  git commit -m "create md files"
+  263  git status
+  264  touch chatfull.md
+  265  git status
+  266  git status
+  267  git add .
+  268  git commit -m "extra files"
+  269  git status
+  270  git status
+  271  git diff chatull.md
+  272  git diff chatfull.md
+  273  cp chatfull.md ref.md
+  274  git status
+  275  git log
+  276  git checkout 73ae183
+  277  git checkout -
+  278  git config --global --list
+  279  git config --global --edit
+  280  git config --global --list
+  281  git config --global user.name "Tadween"
+  282  git config --global --list
+  283  git branch
+  284  git remote -v
+  285  git remote add origin https://github.com/Tadween4SmartSolutions/pdf-viewer.git
+  286  git push -u origin master
+  287  touch token.txt
+  288  git push -u origin master
+  289  git config --global --list
+  290  git push -u origin master
+  291  history > history.txt
+  292  git status
+  293  git status
+  294  history > history.txt
+  295  git remote -v
+  296  git status
+  297  git add .
+  298  git status
+  299  git commit -m "add Dockerfile"
+  300  git status
+  301  git push
+  302  git status
+  303  git status
+  304  git add .
+  305  git commit -m "add token file to .gitignore"
+  306  git status
+  307  git push
+  308  git log
+  309  git reset --hard HEAD~1
+  310  git log --online
+  311  git log --oneline
+  312  git status
+  313  git reset --soft Head~1
+  314  git status
+  315  git status
+  316  git restore --stage token.txt
+  317  git status
+  318  history > history.txt 

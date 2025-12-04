@@ -1,0 +1,12 @@
+.venv
+.env
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+.git
+.gitignore
+node_modules
+pdfs/thumbnails
+docs/chat-raw*.md
