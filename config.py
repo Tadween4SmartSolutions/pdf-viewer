@@ -18,6 +18,9 @@ class Config:
     
     # Search Configuration
     ENABLE_TEXT_SEARCH = True
+    # LLM / Model configuration: set to empty string to disable LLM usage
+    # Example: export DEFAULT_LLM=""  (disables); export DEFAULT_LLM="claude-haiku" (enables)
+    DEFAULT_LLM = os.environ.get('DEFAULT_LLM', '')
     
     # Pagination
     PDFS_PER_PAGE = 12

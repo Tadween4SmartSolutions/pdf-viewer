@@ -128,6 +128,34 @@ def create_app(config_name='default'):
             abort(404)
         return send_file(pdf.file_path, as_attachment=False)
 
+    # Backwards-compatible route used by frontend JS
+    @app.route('/pdf/<path:filename>')
+    def serve_pdf_alias(filename):
+        return serve_pdf(filename)
+
+    @app.route('/pdf/<int:pdf_id>')
+    def serve_pdf_numeric(pdf_id):
+        """Serve a PDF by numeric id for JS compatibility (/pdf/123)."""
+        return serve_pdf_by_id(pdf_id)
+
+    @app.route('/pdf/id/<int:pdf_id>')
+    def serve_pdf_by_id(pdf_id):
+        """Serve a PDF by DB id (used by advanced preview)."""
+        pdf = PDFFile.query.get_or_404(pdf_id)
+        if not os.path.exists(pdf.file_path):
+            abort(404)
+        return send_file(pdf.file_path, as_attachment=False)
+
+    @app.route('/preview/<int:pdf_id>')
+    def preview_json(pdf_id):
+        """Return JSON metadata for advanced preview."""
+        pdf = PDFFile.query.get_or_404(pdf_id)
+        return jsonify({
+            'id': pdf.id,
+            'original_filename': pdf.original_filename,
+            'page_count': pdf.page_count or 1
+        })
+
     @app.route('/thumbnails/<path:filename>')
     def serve_thumbnail(filename):
         """Serve a thumbnail image from the thumbnails folder."""
