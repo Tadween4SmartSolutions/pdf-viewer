@@ -1,5 +1,10 @@
 import os
-import fitz  # PyMuPDF
+try:
+    import pymupdf  # PyMuPDF modern import
+except Exception:
+    # Fallback for environments where PyMuPDF is installed as the `fitz` package
+    # e.g. older installs expose `fitz` as the top-level module.
+    import fitz as pymupdf
 from flask import Flask, render_template, send_file, request, jsonify, flash, redirect, url_for, abort
 from flask_login import LoginManager, current_user, login_required
 from flask_migrate import Migrate
@@ -26,9 +31,9 @@ class PDFProcessor:
     def generate_thumbnail(self, pdf_path, output_path):
         """Generate thumbnail from first page of PDF"""
         try:
-            doc = fitz.open(pdf_path)
+            doc = pymupdf.open(pdf_path)
             page = doc[0]
-            pix = page.get_pixmap(matrix=fitz.Matrix(2, 2))
+            pix = page.get_pixmap(matrix=pymupdf.Matrix(2, 2))
             img_data = pix.tobytes("png")
             
             # Process image with PIL
@@ -44,7 +49,7 @@ class PDFProcessor:
     def extract_text(self, pdf_path, max_pages=10):
         """Extract text from PDF for search"""
         try:
-            doc = fitz.open(pdf_path)
+            doc = pymupdf.open(pdf_path)
             text = ""
             for i, page in enumerate(doc):
                 if i >= max_pages:  # Limit pages for performance
@@ -59,7 +64,7 @@ class PDFProcessor:
     def get_pdf_metadata(self, pdf_path):
         """Extract PDF metadata"""
         try:
-            doc = fitz.open(pdf_path)
+            doc = pymupdf.open(pdf_path)
             metadata = doc.metadata
             page_count = len(doc)
             doc.close()
